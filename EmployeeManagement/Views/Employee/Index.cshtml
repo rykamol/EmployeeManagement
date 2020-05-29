@@ -1,0 +1,124 @@
+﻿@using PagedList.Mvc
+@model PagedList.IPagedList<EmployeeManagement.Models.Employee>
+
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "Index";
+}
+<h2 class="text-center">Employee List</h2>
+<p>
+    @Html.ActionLink("Create New", "Create",new{},new{@class="btn btn-primary"})
+</p>
+@using (Html.BeginForm())
+{
+    <p style="float: right">
+        Search Name: @Html.TextBox("searchData", ViewBag.FilterValue as string)
+        <input class="btn btn-success" type="submit" value="Filter" />
+    </p>
+}
+<table class="table">
+    <tr>
+
+        <th>
+            FirstName
+        </th>
+        <th>
+            LastName
+        </th>
+        <th>
+            Designation
+        </th>
+        <th>
+            JoinDate
+        </th>
+        <th>
+            CurrentSalary
+        </th>
+        <th>
+            Department
+        </th>
+        <th>
+            NextReviewDate
+        </th>
+        <th>
+            DateOfBirth
+        </th>
+        <th>
+            Gender
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Designation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JoinDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CurrentSalary)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NextReviewDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateOfBirth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-primary" }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-info" }) |
+                <button class="btn btn-danger" onClick="Delet(@item.Id)">Delete</button>
+            </td>
+        </tr>
+    }
+
+</table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+@Html.PagedListPager(Model, pageNo =>Url.Action("Index",
+    new { pageNo, Filter_Value = ViewBag.FilterValue }))
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        function Delet(id) {
+            if (confirm("Are you sure you want to delete the record?")) {
+                $.ajax({
+                    url: "/Employee/Delete",
+                    data: JSON.stringify({ id: id }),
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.status === "Success") {
+                            window.location.replace("/Employee/Index");
+                        }
+                        else {
+                            alert(result.status);
+                        }
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+            }
+        }
+
+    </script>
+}
